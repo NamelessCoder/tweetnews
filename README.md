@@ -39,10 +39,13 @@ On TYPO3 versions from 4.5 to and including 6.0
    it trigger a new tweet, effectively preventing duplicates. However, this can result in some confusion with very low maximum
    title lengths and news posts which are very similarly named - when saving the news record you will see a message indicating
    when the news item was previously tweeted, you can use this information to track down the cause of unexpected tweet supression.
+4. The news item must have an UID - in other words: it must have been saved at least once before tweets will trigger.
 
 ### Pitfalls
 
 1. Make sure you set `plugin.tx_news.settings.defaultDetailPid` in a template inherited to the sysfolder or page in which you
    store your EXT:news records. If you need multiple target pids, use multiple storage folders and override TypoScript as needed.
+2. Tweeting only happens when the record has been saved at least once prior. Usually this should not be a problem if you preview
+   your news items but some, like me, do one-shot updates from time to time. In this case simply save the news item twice.
 
 ## Have fun, enjoy!
