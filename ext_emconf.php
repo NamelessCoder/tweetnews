@@ -42,10 +42,8 @@ $EM_CONF[$_EXTKEY] = array (
 			'news' => '',
 			'flux' => '',
 		),
-		'conflicts' => '',
-		'suggests' =>
-		array (
-		),
+		'conflicts' => array(),
+		'suggests' => array (),
 	),
 );
 
