@@ -40,4 +40,9 @@ On TYPO3 versions from 4.5 to and including 6.0
    title lengths and news posts which are very similarly named - when saving the news record you will see a message indicating
    when the news item was previously tweeted, you can use this information to track down the cause of unexpected tweet supression.
 
+### Pitfalls
+
+1. Make sure you set `plugin.tx_news.settings.defaultDetailPid` in a template inherited to the sysfolder or page in which you
+   store your EXT:news records. If you need multiple target pids, use multiple storage folders and override TypoScript as needed.
+
 ## Have fun, enjoy!
