@@ -10,7 +10,9 @@ Tweets news items and links to news items. Nothing else.
 
 ### How does it work?
 
-By connecting to the Twitter REST API using the third party PHP library "CodeBird" (thanks a bunch to `mynetx` for that one!)
+By connecting to the Twitter REST API using the third party PHP library "CodeBird" (thanks a bunch to `mynetx` for that one!).
+
+Currently uses Flux for quick access to triggers on record saving hooks - a future (non-beta) version will remove this dependency.
 
 ### Where does it work?
 
