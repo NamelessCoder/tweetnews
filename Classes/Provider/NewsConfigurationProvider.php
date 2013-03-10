@@ -69,6 +69,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 
 		$uri = $this->getUriForNewsItem($newsItem);
 		$uri = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $uri;
+		$uri = urlencode($uri);
 		$tweet = $truncatedTitle . ($settings['addSpaceBeforeBindingText'] ? ' ' : '') .
 			$settings['bindingText'] .
 			($settings['addSpaceAfterBindingText'] ? ' ' : '') .
