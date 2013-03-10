@@ -1,0 +1,26 @@
+plugin.tx_tweetnews.settings {
+	# consumer key of application as defined in Twitter Developer site
+	consumerKey =
+	# consumer secret from Twitter Developer site
+	consumerSecret =
+	# access token from Twitter Developer site
+	accessToken =
+	# access token secret from Twitter Developer site
+	accessTokenSecret =
+	# binding text - small piece of text, usually one character (- or : make sense) to insert between truncated title and link
+	bindingText = -
+	# suffix to append to truncated titles
+	truncatedTitleSuffix = ...
+	# add a single space before the binding text?
+	addSpaceBeforeBindingText = 1
+	# convert news-tags to hashmarks
+	convertNewsTagsToHashTags = 1
+	# add a single space after the binding text?
+	addSpaceAfterBindingText = 1
+	# display author name after tweet?
+	displayAuthor = 1
+	# author binding text - the small text piece inserted after link, before name of author
+	authorBindingText = by
+	# maximum title length. Make sure you enter a value that allows for link, author and any tags to be added. Reasonable value: ~85
+	maximumTitleLength = 85
+}
