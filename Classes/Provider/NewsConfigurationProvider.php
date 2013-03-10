@@ -41,7 +41,6 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$now = time();
 		// validity and published status checks
 		if ($newsItem->getDatetime()->getTimestamp() > $now) {
-			#die('test');
 			return;
 		}
 		if ($newsItem->getHidden()) {
