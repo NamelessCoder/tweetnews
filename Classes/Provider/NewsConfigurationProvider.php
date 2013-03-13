@@ -50,19 +50,8 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$query->matching($query->equals('uid', $id));
 		/** @var $newsItem Tx_News_Domain_Model_News */
 		$newsItem = $query->execute()->getFirst();
-		if (TRUE === empty($newsItem)) {
-			$this->sendFlashMessage('News item not yet tweeted - save it once more to trigger tweeting');
-			return;
-		}
-		$now = time();
-		// validity and published status checks
-		if ($newsItem->getDatetime()->getTimestamp() > $now) {
-			return;
-		}
-		if ($newsItem->getHidden()) {
-			return;
-		}
-		if ($newsItem->getDeleted()) {
+		$proceed = $this->consistencyCheck($newsItem);
+		if (FALSE === $proceed) {
 			return;
 		}
 
@@ -140,6 +129,40 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	}
 
 	/**
+	 * @param Tx_News_Domain_Model_News $newsItem
+	 * @return void
+	 */
+	protected function consistencyCheck(Tx_News_Domain_Model_News $newsItem) {
+		$debugMode = $this->getLocalSetting('debug');
+		$verdict = TRUE;
+		if (TRUE === empty($newsItem)) {
+			$this->sendFlashMessage('News item not yet tweeted - save it once more to trigger tweeting');
+			$verdict = FALSE;
+		}
+		$now = time();
+		// validity and published status checks
+		if ($newsItem->getDatetime()->getTimestamp() > $now) {
+			$verdict = FALSE;
+			if ($debugMode) {
+				$this->sendFlashMessage('Debug: Tweet prevented - date is in the future (' . $newsItem->getDatetime()->format('Y-m-d H:i') . ')');
+			}
+		}
+		if ($newsItem->getHidden()) {
+			$verdict = FALSE;
+			if ($debugMode) {
+				$this->sendFlashMessage('Debug: Tweet prevented - news item is hidden');
+			}
+		}
+		if ($newsItem->getDeleted()) {
+			$verdict = FALSE;
+			if ($debugMode) {
+				$this->sendFlashMessage('Debug: Tweet prevented - news item is deleted');
+			}
+		}
+		return $verdict;
+	}
+
+	/**
 	 * @param mixed $nameOrNamesArray
 	 * @return mixed
 	 */
@@ -180,16 +203,21 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	 */
 	protected function getUriForNewsItem(Tx_News_Domain_Model_News $newsItem) {
 		Tx_Extbase_Utility_FrontendSimulator::simulateFrontendEnvironment($this->configurationManager->getContentObject());
+		/** @var $settingsService Tx_Tweetnews_Service_SettingsService */
+		$settingsService = $this->objectManager->get('Tx_Tweetnews_Service_SettingsService');
+		$settings = $this->getSettings('news');
+		$template = new t3lib_TStemplate();
+		$pageSelect = new t3lib_pageSelect();
+		$rootLine = $pageSelect->getRootLine($settings['defaultDetailPid']);
+		$template->start($rootLine);
+		$template->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->sys_page = new t3lib_pageSelect();
-		$GLOBALS['TSFE']->tmpl = new t3lib_TStemplate();
+		$GLOBALS['TSFE']->tmpl = &$template;
 		$GLOBALS['TT'] = new t3lib_TimeTrackNull();
 		$arguments = array(
 			'newsItem' => $newsItem,
 			'uriOnly' => TRUE,
 		);
-		/** @var $settingsService Tx_Tweetnews_Service_SettingsService */
-		$settingsService = $this->objectManager->get('Tx_Tweetnews_Service_SettingsService');
-		$settings = $this->getSettings('news');
 		/** @var $context Tx_Fluid_Core_Rendering_RenderingContext */
 		$context = new Tx_Fluid_Core_Rendering_RenderingContext();
 		/** @var $viewHelper Tx_News_ViewHelpers_LinkViewHelper */
@@ -203,7 +231,6 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$viewHelper->setViewHelperNode($node);
 		$viewHelper->setRenderingContext($context);
 		$viewHelper->setArguments($arguments);
-
 		$uri = $viewHelper->render($newsItem, $settings, TRUE, array('absRefPrefix' => 1));
 		Tx_Extbase_Utility_FrontendSimulator::resetFrontendEnvironment();
 		return $uri;
