@@ -8,6 +8,16 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	protected $newsRepository;
 
 	/**
+	 * @var array
+	 */
+	protected $localSettings = array();
+
+	/**
+	 * @var array
+	 */
+	protected $newsSettings = array();
+
+	/**
 	 * @var string
 	 */
 	protected $tableName = 'tx_news_domain_model_news';
@@ -18,6 +28,11 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	 */
 	public function injectNewsRepository(Tx_News_Domain_Repository_NewsRepository $newsRepository) {
 		$this->newsRepository = $newsRepository;
+	}
+
+	public function initializeObject() {
+		$this->localSettings = $this->getSettings('tweetnews');
+		$this->newsSettings = $this->getSettings('news');
 	}
 
 	/**
@@ -50,19 +65,36 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 			return;
 		}
 
-		$settings = $this->getSettings('tweetnews');
-		$debugMode = intval($settings['debug']) > 0;
+		$localSettings = array(
+			'debug', 'consumerKey', 'consumerSecret', 'accessToken', 'accessTokenSecret',
+			'maximumTitleLength', 'truncatedTitleSuffix', 'bindingText', 'addSpaceBeforeBindingText',
+			'addSpaceAfterBindingText', 'displayAuthor', 'authorBindingText'
+		);
+		list (
+			$debugMode,
+			$consumerKey,
+			$consumerSecret,
+			$accessToken,
+			$accessTokenSecret,
+			$maximumTitleLength,
+			$truncatedTitleSuffix,
+			$bindingText,
+			$addSpaceBeforeBindingText,
+			$addSpaceAfterBindingText,
+			$displayAuthor,
+			$authorBindingText
+			) = $this->getLocalSetting($localSettings);
 		$title = $newsItem->getTitle();
-		if (strlen($title) <= intval($settings['maximumTitleLength'])) {
+		if (strlen($title) <= intval($maximumTitleLength)) {
 			$truncatedTitle = $title;
 		} else {
-			$truncatedTitle = substr($title, 0, $settings['maximumTitleLength']);
-			$truncatedTitle .= $settings['truncatedTitleSuffix'];
+			$truncatedTitle = substr($title, 0, $maximumTitleLength);
+			$truncatedTitle .= $truncatedTitleSuffix;
 		}
 
 		$api = Codebird::getInstance();
-		$api->setConsumerKey($settings['consumerKey'], $settings['consumerSecret']);
-		$api->setToken($settings['accessToken'], $settings['accessTokenSecret']);
+		$api->setConsumerKey($consumerKey, $consumerSecret);
+		$api->setToken($accessToken, $accessTokenSecret);
 		$timeline = $api->statuses_homeTimeline();
 		foreach ($timeline as $tweet) {
 			if (0 === strpos($tweet->text, $truncatedTitle)) {
@@ -74,19 +106,55 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$uri = $this->getUriForNewsItem($newsItem);
 		$uri = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $uri;
 		$uri = urlencode($uri);
-		$tweet = $truncatedTitle . ($settings['addSpaceBeforeBindingText'] ? ' ' : '') .
-			$settings['bindingText'] .
-			($settings['addSpaceAfterBindingText'] ? ' ' : '') .
+		if ($debugMode) {
+			$linkShortenerOutputLength = 25;
+			if ($linkShortenerOutputLength < strlen($uri)) {
+				$linkShortenedChars = strlen($uri) - ($linkShortenerOutputLength + 3); // suffixed ellipsis takes another 3 chars.
+				$uri = substr($uri, 0, $linkShortenerOutputLength) . '...';
+			}
+		}
+		$tweet = $truncatedTitle . ($addSpaceBeforeBindingText ? ' ' : '') .
+			$bindingText .
+			($addSpaceAfterBindingText ? ' ' : '') .
 			$uri;
-		if ($newsItem->getAuthor() && $settings['displayAuthor'] > 0) {
-			$tweet .= $settings['authorBindingText'] . ' ' . $newsItem->getAuthor();
+		if ($newsItem->getAuthor() && $displayAuthor > 0) {
+			$tweet .= $authorBindingText . ' ' . $newsItem->getAuthor();
 		}
+		if ($debugMode) {
+			$debugText = 'Would tweet: "' . urldecode($tweet);
+			$debugText .= '"<br />(' . (strlen($tweet)) . ' chars assuming link shortening to ' .
+				$linkShortenerOutputLength . ' chars plus ellipsis suffix)';
+			$this->sendFlashMessage($debugText);
+		} else {
+			$response = $api->statuses_update('status=' . $tweet);
+			if ($response->httpstatus != 200) {
+				throw new Exception('Error while tweeting news item; consult the TYPO3 log for additional details', 1362952088);
+			}
+			$this->sendFlashMessage('Tweeted: "' . $response->text . '"<br />(' . strlen($response->text) . ' chars. Date stamp: ' .
+				$response->created_at . ')');
+		}
+	}
 
-		$response = $api->statuses_update('status=' . $tweet);
-		if ($response->httpstatus != 200) {
-			throw new Exception('Error while tweeting news item; consult the TYPO3 log for additional details', 1362952088);
+	/**
+	 * @param mixed $nameOrNamesArray
+	 * @return mixed
+	 */
+	protected function getLocalSetting($nameOrNamesArray) {
+		if (TRUE === is_array($nameOrNamesArray)) {
+			return array_map(array($this, 'getLocalSetting'), $nameOrNamesArray);
 		}
-		$this->sendFlashMessage('Tweeted: ' . $response->text);
+		return $this->localSettings[$nameOrNamesArray];
+	}
+
+	/**
+	 * @param mixed $nameOrNamesArray
+	 * @return mixed
+	 */
+	protected function getNewsSetting($nameOrNamesArray) {
+		if (TRUE === is_array($nameOrNamesArray)) {
+			return array_map(array($this, 'getNewsSetting'), $nameOrNamesArray);
+		}
+		return $this->newsSettings[$nameOrNamesArray];
 	}
 
 	/**
