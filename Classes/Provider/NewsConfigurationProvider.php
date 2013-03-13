@@ -51,6 +51,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		}
 
 		$settings = $this->getSettings('tweetnews');
+		$debugMode = intval($settings['debug']) > 0;
 		$title = $newsItem->getTitle();
 		if (strlen($title) <= intval($settings['maximumTitleLength'])) {
 			$truncatedTitle = $title;

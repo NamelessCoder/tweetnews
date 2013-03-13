@@ -1,4 +1,6 @@
 plugin.tx_tweetnews.settings {
+	# debug mode. If set to "1", does not actually tweet - instead, it shows a flash message containing the tweet text
+	debug = 0
 	# consumer key of application as defined in Twitter Developer site
 	consumerKey =
 	# consumer secret from Twitter Developer site
