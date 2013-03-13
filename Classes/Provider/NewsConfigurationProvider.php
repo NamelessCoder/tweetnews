@@ -50,10 +50,6 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$query->matching($query->equals('uid', $id));
 		/** @var $newsItem Tx_News_Domain_Model_News */
 		$newsItem = $query->execute()->getFirst();
-		$proceed = $this->consistencyCheck($newsItem);
-		if (FALSE === $proceed) {
-			return;
-		}
 
 		$localSettings = array(
 			'debug', 'consumerKey', 'consumerSecret', 'accessToken', 'accessTokenSecret',
@@ -82,6 +78,12 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 			$truncatedTitle .= $truncatedTitleSuffix;
 		}
 
+		$proceed = $this->consistencyCheck($newsItem);
+		if (FALSE === $proceed && !$debugMode) {
+			return;
+		} elseif ($debugMode) {
+			$this->sendFlashMessage('Debug: Proceeding regardless of prevented tweeting.');
+		}
 		$api = Codebird::getInstance();
 		$api->setConsumerKey($consumerKey, $consumerSecret);
 		$api->setToken($accessToken, $accessTokenSecret);
