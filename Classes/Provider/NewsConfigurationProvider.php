@@ -106,13 +106,15 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 
 		$uri = $this->getUriForNewsItem($newsItem);
 		$uri = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $uri;
-		$uri = urlencode($uri);
 		if ($debugMode) {
+			$fullUri = $uri;
 			$linkShortenerOutputLength = 25;
 			if ($linkShortenerOutputLength < strlen($uri)) {
 				$linkShortenedChars = strlen($uri) - ($linkShortenerOutputLength + 3); // suffixed ellipsis takes another 3 chars.
 				$uri = substr($uri, 0, $linkShortenerOutputLength) . '...';
 			}
+		} else {
+			$uri = urlencode($uri);
 		}
 		$tweet = $truncatedTitle . ($addSpaceBeforeBindingText ? ' ' : '') .
 			$bindingText .
@@ -124,7 +126,8 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		if ($debugMode) {
 			$debugText = 'Would tweet: "' . urldecode($tweet);
 			$debugText .= '"<br />(' . (strlen($tweet)) . ' chars assuming link shortening to ' .
-				$linkShortenerOutputLength . ' chars plus ellipsis suffix)';
+				$linkShortenerOutputLength . ' chars plus ellipsis suffix)' .
+				'<br /> The tweeted URL would be: <a href="' . $fullUri . '">' . $fullUri . '</a>.';
 			$this->sendFlashMessage($debugText);
 		} else {
 			$response = $api->statuses_update('status=' . $tweet);
