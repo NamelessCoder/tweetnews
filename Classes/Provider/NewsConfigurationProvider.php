@@ -50,6 +50,10 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$query->matching($query->equals('uid', $id));
 		/** @var $newsItem Tx_News_Domain_Model_News */
 		$newsItem = $query->execute()->getFirst();
+		if (TRUE === empty($newsItem)) {
+			$this->sendFlashMessage('News item not yet tweeted - save it once more to trigger tweeting');
+			return;
+		}
 
 		$localSettings = array(
 			'debug', 'consumerKey', 'consumerSecret', 'accessToken', 'accessTokenSecret',
@@ -137,10 +141,6 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	protected function consistencyCheck(Tx_News_Domain_Model_News $newsItem) {
 		$debugMode = $this->getLocalSetting('debug');
 		$verdict = TRUE;
-		if (TRUE === empty($newsItem)) {
-			$this->sendFlashMessage('News item not yet tweeted - save it once more to trigger tweeting');
-			$verdict = FALSE;
-		}
 		$now = time();
 		// validity and published status checks
 		if ($newsItem->getDatetime()->getTimestamp() > $now) {
