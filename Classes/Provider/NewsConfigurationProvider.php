@@ -208,12 +208,12 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		/** @var $settingsService Tx_Tweetnews_Service_SettingsService */
 		$settingsService = $this->objectManager->get('Tx_Tweetnews_Service_SettingsService');
 		$settings = $this->getSettings('news');
+		$GLOBALS['TT'] = new t3lib_TimeTrackNull();
 		$GLOBALS['TSFE']->sys_page = new t3lib_pageSelect();
 		$GLOBALS['TSFE']->tmpl = new t3lib_TStemplate();
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
-		$GLOBALS['TT'] = new t3lib_TimeTrackNull();
 		$arguments = array(
 			'newsItem' => $newsItem,
 			'uriOnly' => TRUE,
