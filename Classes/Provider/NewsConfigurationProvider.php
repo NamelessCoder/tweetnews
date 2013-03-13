@@ -46,6 +46,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	public function postProcessRecord($operation, $id, array &$row, t3lib_TCEmain $reference) {
 		$query = $this->newsRepository->createQuery();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
+		$query->getQuerySettings()->setIgnoreEnableFields(TRUE);
 		$query->matching($query->equals('uid', $id));
 		/** @var $newsItem Tx_News_Domain_Model_News */
 		$newsItem = $query->execute()->getFirst();
