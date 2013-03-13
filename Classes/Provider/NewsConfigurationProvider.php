@@ -239,7 +239,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$viewHelper->setViewHelperNode($node);
 		$viewHelper->setRenderingContext($context);
 		$viewHelper->setArguments($arguments);
-		$uri = $viewHelper->render($newsItem, $settings, TRUE, array('absRefPrefix' => 1));
+		$uri = $viewHelper->render($newsItem, $localisedSettings, TRUE, array('absRefPrefix' => 1));
 		Tx_Extbase_Utility_FrontendSimulator::resetFrontendEnvironment();
 		return $uri;
 	}
