@@ -204,14 +204,14 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 	 * @return string
 	 */
 	protected function getUriForNewsItem(Tx_News_Domain_Model_News $newsItem) {
-		Tx_Extbase_Utility_FrontendSimulator::simulateFrontendEnvironment($this->configurationManager->getContentObject());
+		#Tx_Extbase_Utility_FrontendSimulator::simulateFrontendEnvironment($this->configurationManager->getContentObject());
 		/** @var $settingsService Tx_Tweetnews_Service_SettingsService */
 		$settingsService = $this->objectManager->get('Tx_Tweetnews_Service_SettingsService');
 		$settings = $this->getSettings('news');
 		$GLOBALS['TT'] = new t3lib_TimeTrackNull();
+		$GLOBALS['TSFE'] = new tslib_fe($GLOBALS['TYPO3_CONF_VARS'], $newsItem->getPid(), 0);
 		$GLOBALS['TSFE']->sys_page = new t3lib_pageSelect();
 		$GLOBALS['TSFE']->tmpl = new t3lib_TStemplate();
-
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($newsItem->getPid());
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
@@ -219,8 +219,12 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
+		$GLOBALS['TSFE']->config = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup);
+		$GLOBALS['TSFE']->config['mainScript'] = 'index.php';
 		$localisedSettings = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
 		$localisedSettings['detailPid'] = $localisedSettings['defaultDetailPid'] > 0 ? $localisedSettings['defaultDetailPid'] : $localisedSettings['detailPid'];
+		$GLOBALS['TSFE']->id = $localisedSettings['detailPid'];
+		$GLOBALS['TSFE']->absRefPrefix = '';
 		$settingsService->setOverriddenSettings($localisedSettings);
 		$arguments = array(
 			'newsItem' => $newsItem,
@@ -239,7 +243,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$viewHelper->setViewHelperNode($node);
 		$viewHelper->setRenderingContext($context);
 		$viewHelper->setArguments($arguments);
-		$uri = $viewHelper->render($newsItem, $localisedSettings, TRUE, array('absRefPrefix' => 1));
+		$uri = $viewHelper->render($newsItem, $localisedSettings, TRUE);
 		Tx_Extbase_Utility_FrontendSimulator::resetFrontendEnvironment();
 		return $uri;
 	}
