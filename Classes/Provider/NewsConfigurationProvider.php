@@ -215,12 +215,15 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid'] ? $settings['defaultDetailPid'] : $newsItem->getPid());
 			$GLOBALS['TSFE']->tmpl->start($rootLine);
 			$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
-			$settings['defaultDetailPid'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']['defaultDetailPid'];
+			$settings['defaultDetailPid'] = $settings['detailPid'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']['defaultDetailPid'];
+		} else {
+
 		}
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
 		$localisedSettings = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
+		$localisedSettings['detailPid'] = $localisedSettings['defaultDetailPid'] > 0 ? $localisedSettings['defaultDetailPid'] : $localisedSettings['detailPid'];
 		$settingsService->setOverriddenSettings($localisedSettings);
 		$arguments = array(
 			'newsItem' => $newsItem,
