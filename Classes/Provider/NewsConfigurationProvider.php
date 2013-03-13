@@ -220,6 +220,8 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
+		$localisedSettings = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
+		$settingsService->setOverriddenSettings($localisedSettings);
 		$arguments = array(
 			'newsItem' => $newsItem,
 			'uriOnly' => TRUE,
