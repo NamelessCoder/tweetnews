@@ -211,14 +211,11 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$GLOBALS['TT'] = new t3lib_TimeTrackNull();
 		$GLOBALS['TSFE']->sys_page = new t3lib_pageSelect();
 		$GLOBALS['TSFE']->tmpl = new t3lib_TStemplate();
-		if (!$settings['defaultDetailPid']) {
-			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid'] ? $settings['defaultDetailPid'] : $newsItem->getPid());
-			$GLOBALS['TSFE']->tmpl->start($rootLine);
-			$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
-			$settings['defaultDetailPid'] = $settings['detailPid'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']['defaultDetailPid'];
-		} else {
 
-		}
+		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($newsItem->getPid());
+		$GLOBALS['TSFE']->tmpl->start($rootLine);
+		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
+		$settings['defaultDetailPid'] = $settings['detailPid'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']['defaultDetailPid'];
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
