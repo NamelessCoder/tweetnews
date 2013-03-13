@@ -212,7 +212,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$GLOBALS['TSFE']->sys_page = new t3lib_pageSelect();
 		$GLOBALS['TSFE']->tmpl = new t3lib_TStemplate();
 		if (!$settings['defaultDetailPid']) {
-			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid'] ? $settings['defaultDetailPid'] : t3lib_div::_GET('id'));
+			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid'] ? $settings['defaultDetailPid'] : $newsItem->getPid());
 			$GLOBALS['TSFE']->tmpl->start($rootLine);
 			$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 			$settings['defaultDetailPid'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']['defaultDetailPid'];
