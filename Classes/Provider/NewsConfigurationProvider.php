@@ -195,7 +195,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 			Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
 		);
 		$settings = (array) $settings['plugin.']['tx_' . $extensionKey . '.']['settings.'];
-		$settings = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($settings);
+		$settings = t3lib_div::removeDotsFromTS($settings);
 		return $settings;
 	}
 
@@ -219,9 +219,9 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($settings['defaultDetailPid']);
 		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine);
 		$GLOBALS['TSFE']->tmpl->start($rootLine);
-		$GLOBALS['TSFE']->config = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup);
+		$GLOBALS['TSFE']->config = t3lib_div::removeDotsFromTS($GLOBALS['TSFE']->tmpl->setup);
 		$GLOBALS['TSFE']->config['mainScript'] = 'index.php';
-		$localisedSettings = Tx_Flux_Utility_Array::convertTypoScriptArrayToPlainArray($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
+		$localisedSettings = t3lib_div::removeDotsFromTS($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
 		$localisedSettings['detailPid'] = $localisedSettings['defaultDetailPid'] > 0 ? $localisedSettings['defaultDetailPid'] : $localisedSettings['detailPid'];
 		$GLOBALS['TSFE']->id = $localisedSettings['detailPid'];
 		$GLOBALS['TSFE']->absRefPrefix = '';
