@@ -225,6 +225,7 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$localisedSettings['detailPid'] = $localisedSettings['defaultDetailPid'] > 0 ? $localisedSettings['defaultDetailPid'] : $localisedSettings['detailPid'];
 		$GLOBALS['TSFE']->id = $localisedSettings['detailPid'];
 		$GLOBALS['TSFE']->absRefPrefix = '';
+		$GLOBALS['TSFE']->rootLine = $rootLine;
 		$settingsService->setOverriddenSettings($localisedSettings);
 		$arguments = array(
 			'newsItem' => $newsItem,
