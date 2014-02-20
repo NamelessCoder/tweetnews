@@ -223,8 +223,12 @@ class Tx_Tweetnews_Provider_NewsConfigurationProvider extends Tx_Flux_Provider_A
 		$GLOBALS['TSFE']->config['mainScript'] = 'index.php';
 		$localisedSettings = t3lib_div::removeDotsFromTS($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_news.']['settings.']);
 		$localisedSettings['detailPid'] = $localisedSettings['defaultDetailPid'] > 0 ? $localisedSettings['defaultDetailPid'] : $localisedSettings['detailPid'];
+		if (!$localisedSettings['detailPid']) {
+			$localisedSettings['detailPid'] = $settings['defaultDetailPid'];
+		}
 		$GLOBALS['TSFE']->id = $localisedSettings['detailPid'];
 		$GLOBALS['TSFE']->absRefPrefix = '';
+		$GLOBALS['TSFE']->rootLine = $rootLine;
 		$settingsService->setOverriddenSettings($localisedSettings);
 		$arguments = array(
 			'newsItem' => $newsItem,
